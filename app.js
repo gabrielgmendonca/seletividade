@@ -71,6 +71,7 @@ const ELOGIOS = [
 /* ===================== ESTADO ===================== */
 
 const STORE_KEY = 'amigos-da-comida-v1';
+const VERSAO = 3; // manter em sincronia com o CACHE do sw.js
 
 const state = {
   stars: 0,
@@ -145,18 +146,35 @@ function escolherVoz() {
   vozPt = vozes.find(v => v.lang === 'pt-BR') || vozes.find(v => v.lang.startsWith('pt')) || null;
 }
 
+/* Regex de emojis montada em runtime: um literal com \p{Extended_Pictographic}
+   é erro de sintaxe em WebView/Chrome antigos e derrubaria o app inteiro no parse. */
+let emojiRe;
+try {
+  emojiRe = new RegExp('[\\p{Extended_Pictographic}\\u{FE0F}\\u{200D}]', 'gu');
+} catch (e) {
+  // Fallback: pares substitutos (onde vivem os emojis) + setas/símbolos/dingbats
+  emojiRe = /[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2190-\u2BFF\uFE0F\u200D]/g;
+}
+
+let falarTimer = null;
+
 function falar(texto) {
   if (!state.voz || !('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
   // Remove emojis para a voz não ler o nome deles ("rosto festejando" etc.)
-  const limpo = texto.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, '').replace(/\s+/g, ' ').trim();
+  const limpo = texto.replace(emojiRe, '').replace(/\s+/g, ' ').trim();
   if (!limpo) return;
   const u = new SpeechSynthesisUtterance(limpo);
   u.lang = 'pt-BR';
   u.rate = 0.95;
   u.pitch = 1.1;
   if (vozPt) u.voice = vozPt;
-  speechSynthesis.speak(u);
+  clearTimeout(falarTimer);
+  speechSynthesis.cancel();
+  // Chrome no Android engole o speak() chamado logo após cancel(); o atraso evita
+  falarTimer = setTimeout(() => {
+    speechSynthesis.resume();
+    speechSynthesis.speak(u);
+  }, 80);
 }
 
 if ('speechSynthesis' in window) {
@@ -764,3 +782,4 @@ if (navigator.storage && navigator.storage.persist) {
 
 load();
 atualizarEstrelas();
+$('#versao-app').textContent = `Amigos da Comida — versão ${VERSAO}`;

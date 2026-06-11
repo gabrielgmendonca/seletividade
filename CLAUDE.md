@@ -14,7 +14,9 @@ Static site, no build, no dependencies, no tests, no lint:
 python3 -m http.server 8000   # any static server works
 ```
 
-The service worker (`sw.js`) caches aggressively with a cache-first strategy under the key `amigos-da-comida-v1`. When changing any file, bump that cache name or a previously-loaded client will keep serving stale assets. The SW does not register on `file:` protocol, so opening `index.html` directly also works for quick checks (without offline/PWA behavior).
+The service worker (`sw.js`) caches aggressively with a cache-first strategy. When changing any file, bump the `CACHE` name in `sw.js` **and** the matching `VERSAO` constant in `app.js` (shown in the therapist area to diagnose stale clients) — otherwise a previously-loaded client keeps serving stale assets.
+
+The deploy target includes old/cheap Android devices: avoid recent JS syntax that fails at parse time on older Chrome/WebView (e.g. `\p{...}` regex literals — build those with `new RegExp` inside try/catch). `localStorage` data must survive — `STORE_KEY` stays `amigos-da-comida-v1` even as `VERSAO` bumps. The SW does not register on `file:` protocol, so opening `index.html` directly also works for quick checks (without offline/PWA behavior).
 
 ## Architecture
 

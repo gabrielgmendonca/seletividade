@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'amigos-da-comida-v2';
+const CACHE = 'amigos-da-comida-v3';
 const ARQUIVOS = [
   './',
   'index.html',
