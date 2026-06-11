@@ -1,0 +1,19 @@
+{
+  "name": "Amigos da Comida",
+  "short_name": "Amigos da Comida",
+  "description": "Jogo terapêutico para seletividade alimentar — ferramenta de apoio para fonoaudiólogas.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#fff8f0",
+  "theme_color": "#ff8a65",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

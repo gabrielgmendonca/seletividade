@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ff8a65">
+  <meta name="description" content="Jogo terapêutico para seletividade alimentar — ferramenta de apoio para fonoaudiólogas.">
+  <title>Amigos da Comida 🍎</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Barra superior -->
+  <header id="topbar">
+    <button id="btn-home" class="icon-btn" aria-label="Voltar ao início">🏠</button>
+    <div id="title">Amigos da Comida</div>
+    <div id="stars-badge" aria-label="Estrelas conquistadas">⭐ <span id="stars-count">0</span></div>
+  </header>
+
+  <main id="app">
+
+    <!-- ======== INÍCIO ======== -->
+    <section class="screen active" id="screen-home">
+      <h1 class="home-title">O que vamos brincar hoje?</h1>
+      <div class="menu">
+        <button class="menu-btn" data-go="screen-passos" style="--c:#ff8a65">
+          <span class="menu-emoji">🪜</span>
+          <span class="menu-label">Passos da Coragem</span>
+          <span class="menu-sub">Conhecer um alimento pertinho</span>
+        </button>
+        <button class="menu-btn" data-go="screen-explorar" style="--c:#4fc3f7">
+          <span class="menu-emoji">🔍</span>
+          <span class="menu-label">Amigos da Comida</span>
+          <span class="menu-sub">Descobrir curiosidades</span>
+        </button>
+        <button class="menu-btn" data-go="screen-prato" style="--c:#81c784">
+          <span class="menu-emoji">🌈</span>
+          <span class="menu-label">Prato Arco-Íris</span>
+          <span class="menu-sub">Montar um prato colorido</span>
+        </button>
+        <button class="menu-btn" data-go="screen-memoria" style="--c:#ba68c8">
+          <span class="menu-emoji">🃏</span>
+          <span class="menu-label">Jogo da Memória</span>
+          <span class="menu-sub">Encontrar os pares</span>
+        </button>
+        <button class="menu-btn" data-go="screen-detetive" style="--c:#ffd54f">
+          <span class="menu-emoji">🕵️</span>
+          <span class="menu-label">Detetive dos Alimentos</span>
+          <span class="menu-sub">Achar por cores e grupos</span>
+        </button>
+      </div>
+      <button id="btn-terapeuta" class="ghost-btn">🔒 Área da terapeuta</button>
+    </section>
+
+    <!-- ======== PASSOS DA CORAGEM: escolher alimento ======== -->
+    <section class="screen" id="screen-passos">
+      <h2 class="screen-title">Escolha um alimento para conhecer</h2>
+      <p class="screen-hint">Cada passinho vale uma estrela. Sem pressa! 💛</p>
+      <div id="passos-food-grid" class="food-grid"></div>
+    </section>
+
+    <!-- ======== PASSOS DA CORAGEM: escada ======== -->
+    <section class="screen" id="screen-escada">
+      <div id="escada-food" class="escada-food"></div>
+      <div id="escada-steps" class="escada-steps"></div>
+    </section>
+
+    <!-- ======== EXPLORAR ======== -->
+    <section class="screen" id="screen-explorar">
+      <h2 class="screen-title">Toque em um alimento para conhecer!</h2>
+      <div id="explorar-grid" class="food-grid"></div>
+    </section>
+
+    <!-- ======== PRATO ARCO-ÍRIS ======== -->
+    <section class="screen" id="screen-prato">
+      <h2 class="screen-title">Monte um prato bem colorido!</h2>
+      <div id="prato-cores" class="prato-cores"></div>
+      <div id="prato" class="prato"></div>
+      <div class="prato-acoes">
+        <button id="btn-prato-limpar" class="ghost-btn">🧽 Limpar prato</button>
+      </div>
+      <div id="prato-palette" class="food-grid small"></div>
+    </section>
+
+    <!-- ======== MEMÓRIA ======== -->
+    <section class="screen" id="screen-memoria">
+      <h2 class="screen-title">Encontre os pares!</h2>
+      <div id="memoria-grid" class="memoria-grid"></div>
+      <button id="btn-memoria-novo" class="ghost-btn">🔄 Jogar de novo</button>
+    </section>
+
+    <!-- ======== DETETIVE ======== -->
+    <section class="screen" id="screen-detetive">
+      <h2 class="screen-title" id="detetive-pergunta">Detetive dos Alimentos</h2>
+      <div id="detetive-progresso" class="detetive-progresso"></div>
+      <div id="detetive-grid" class="food-grid"></div>
+    </section>
+
+    <!-- ======== PORTÃO DA TERAPEUTA ======== -->
+    <section class="screen" id="screen-portao">
+      <h2 class="screen-title">Só para gente grande 😉</h2>
+      <p class="screen-hint" id="portao-pergunta"></p>
+      <div id="portao-opcoes" class="portao-opcoes"></div>
+    </section>
+
+    <!-- ======== ÁREA DA TERAPEUTA ======== -->
+    <section class="screen" id="screen-terapeuta">
+      <h2 class="screen-title">Área da terapeuta</h2>
+
+      <div class="painel">
+        <h3>🎯 Alimentos-alvo da terapia</h3>
+        <p class="painel-hint">Selecione os alimentos que serão trabalhados. Se nenhum for marcado, todos aparecem nos jogos.</p>
+        <div id="alvo-grid" class="alvo-grid"></div>
+      </div>
+
+      <div class="painel">
+        <h3>📈 Progresso nos Passos da Coragem</h3>
+        <div id="progresso-passos"></div>
+      </div>
+
+      <div class="painel">
+        <h3>📝 Registro das sessões</h3>
+        <div id="log-lista" class="log-lista"></div>
+        <div class="painel-acoes">
+          <button id="btn-copiar-log" class="ghost-btn">📋 Copiar relatório</button>
+          <button id="btn-limpar-log" class="ghost-btn danger">🗑️ Apagar registros</button>
+        </div>
+      </div>
+
+      <div class="painel">
+        <h3>⚙️ Opções</h3>
+        <label class="opcao-linha">
+          <input type="checkbox" id="opt-voz" checked>
+          Falar os nomes e instruções em voz alta
+        </label>
+        <button id="btn-zerar" class="ghost-btn danger">♻️ Zerar todo o progresso do app</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal genérico -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card" id="modal-card"></div>
+  </div>
+
+  <!-- Celebração -->
+  <div id="celebra" class="celebra hidden">
+    <div class="celebra-texto" id="celebra-texto"></div>
+  </div>
+
+  <div id="confetti-layer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
