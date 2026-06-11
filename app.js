@@ -148,7 +148,10 @@ function escolherVoz() {
 function falar(texto) {
   if (!state.voz || !('speechSynthesis' in window)) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(texto);
+  // Remove emojis para a voz não ler o nome deles ("rosto festejando" etc.)
+  const limpo = texto.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, '').replace(/\s+/g, ' ').trim();
+  if (!limpo) return;
+  const u = new SpeechSynthesisUtterance(limpo);
   u.lang = 'pt-BR';
   u.rate = 0.95;
   u.pitch = 1.1;
@@ -218,7 +221,7 @@ function abrirModal(html) {
 
 function fecharModal() {
   $('#modal').classList.add('hidden');
-  speechSynthesis && speechSynthesis.cancel();
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
 }
 
 $('#modal').addEventListener('click', e => {
@@ -377,11 +380,18 @@ function montarExplorar() {
 
 /* ===================== PRATO ARCO-ÍRIS ===================== */
 
-const PRATO_META = 5; // cores diferentes para completar
+const PRATO_META = 5; // máximo de cores diferentes para completar
 let pratoItens = [];
+let pratoMeta = PRATO_META;
+
+function coresDisponiveis() {
+  return new Set(alimentosAtivos().map(f => f.cor));
+}
 
 function montarPrato() {
   pratoItens = [];
+  // Com poucos alimentos-alvo pode não haver 5 cores; a meta acompanha o disponível
+  pratoMeta = Math.max(1, Math.min(PRATO_META, coresDisponiveis().size));
   desenharPrato();
   const palette = $('#prato-palette');
   palette.innerHTML = '';
@@ -390,7 +400,7 @@ function montarPrato() {
     card.addEventListener('click', () => adicionarAoPrato(food));
     palette.appendChild(card);
   });
-  falar(`Monte um prato com ${PRATO_META} cores diferentes!`);
+  falar(pratoMeta > 1 ? `Monte um prato com ${pratoMeta} cores diferentes!` : 'Monte um pratinho bem gostoso!');
 }
 
 function adicionarAoPrato(food) {
@@ -401,7 +411,7 @@ function adicionarAoPrato(food) {
   desenharPrato();
 
   const cores = new Set(pratoItens.map(f => f.cor));
-  if (cores.size >= PRATO_META) {
+  if (cores.size >= pratoMeta) {
     ganharEstrela(2);
     registrar(`Prato Arco-Íris: montou um prato com ${cores.size} cores (${pratoItens.map(f => f.nome).join(', ')}).`);
     celebrar('🌈 Que prato lindo e colorido!', 'Uau! Que prato lindo e colorido você montou!');
@@ -415,9 +425,11 @@ function desenharPrato() {
   pratoItens.forEach(f => prato.appendChild(el('span', 'item', f.emoji)));
 
   const coresNoPrato = new Set(pratoItens.map(f => f.cor));
+  const disponiveis = coresDisponiveis();
   const linha = $('#prato-cores');
   linha.innerHTML = '';
   Object.entries(CORES).forEach(([key, cor]) => {
+    if (!disponiveis.has(key)) return; // só mostra cores alcançáveis com os alimentos ativos
     const b = el('div', 'cor-bolinha' + (coresNoPrato.has(key) ? ' ok' : ''));
     b.style.background = coresNoPrato.has(key) ? cor.hex : '#f3f3f3';
     b.textContent = coresNoPrato.has(key) ? '✓' : '';
@@ -743,6 +755,11 @@ document.addEventListener('pointerdown', () => ctx(), { once: true });
 // Service worker para funcionar offline
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => { /* offline opcional */ });
+}
+
+// Armazenamento persistente: evita o Android apagar progresso e registros de sessão
+if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persist().catch(() => { /* melhor esforço */ });
 }
 
 load();

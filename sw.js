@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'amigos-da-comida-v1';
+const CACHE = 'amigos-da-comida-v2';
 const ARQUIVOS = [
   './',
   'index.html',
@@ -8,6 +8,8 @@ const ARQUIVOS = [
   'app.js',
   'manifest.webmanifest',
   'icon.svg',
+  'icon-192.png',
+  'icon-512.png',
 ];
 
 self.addEventListener('install', e => {
